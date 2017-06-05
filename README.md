@@ -1,5 +1,7 @@
 # vue-paginate
 
+This is a fork from the original [TahaSh/vue-paginate](https://github.com/TahaSh/vue-paginate) with some minor changes to the Pagination Links
+
 > This version only works with Vue 2.0. For Vue 1.0, check out the [1.0 branch](https://github.com/TahaSh/vue-paginate/tree/1.0).
 
 The idea of `vue-paginate` is pretty simple. You give it an array of items; specify how many items per page; then get your list of items paginated!
