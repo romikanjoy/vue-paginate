@@ -5,8 +5,8 @@
   "main": "dist/vue-paginate.js",
   "scripts": {
     "build": "rollup --environment NODE_ENV:production -c build/rollup.config.js && uglifyjs dist/vue-paginate.js -cm --comments -o dist/vue-paginate.min.js",
-    "test": "./node_modules/karma/bin/karma start",
-    "dev": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --content-base examples --open --inline --hot"
+    "test": "karma start",
+    "dev": "webpack-dev-server --content-base examples --open --inline --hot"
   },
   "browserify": {
     "transform": [

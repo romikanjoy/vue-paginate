@@ -125,7 +125,7 @@ export default {
     }
 
     const el = h('ul', {
-      class: ['paginate-links', this.for]
+      class: ['pagination-list', this.for]
     }, links)
 
     if (this.classes) {
@@ -142,7 +142,21 @@ function getFullLinks (vm, h) {
     ? [vm.stepLinks.prev, ...vm.listOfPages, vm.stepLinks.next]
     : vm.listOfPages
   return allLinks.map(link => {
+    const liClasses = getClassesForLink(
+      link,
+      vm.currentPage,
+      vm.listOfPages.length - 1,
+      vm.stepLinks
+    )
+    const disabledStyles = getStylesForDisabled(
+      link,
+      vm.currentPage,
+      vm.listOfPages.length - 1,
+      vm.stepLinks
+    )
     const data = {
+      class: liClasses,
+      style: disabledStyles,
       on: {
         click: (e) => {
           e.preventDefault()
@@ -156,16 +170,10 @@ function getFullLinks (vm, h) {
         }
       }
     }
-    const liClasses = getClassesForLink(
-      link,
-      vm.currentPage,
-      vm.listOfPages.length - 1,
-      vm.stepLinks
-    )
     const linkText = link === vm.stepLinks.next || link === vm.stepLinks.prev
       ? link
       : link + 1 // it means it's a number
-    return h('li', { class: liClasses }, [h('a', data, linkText)])
+    return h('li', [h('a', data, linkText)])
   })
 }
 
@@ -184,7 +192,21 @@ function getLimitedLinks (vm, h) {
   const limitedLinksMetadata = getLimitedLinksMetadata(limitedLinks)
 
   return limitedLinks.map((link, index) => {
+    const liClasses = getClassesForLink(
+      link,
+      vm.currentPage,
+      vm.listOfPages.length - 1,
+      vm.stepLinks
+    )
+    const disabledStyles = getStylesForDisabled(
+      link,
+      vm.currentPage,
+      vm.listOfPages.length - 1,
+      vm.stepLinks
+    )
     const data = {
+      class: liClasses,
+      style: disabledStyles,
       on: {
         click: (e) => {
           e.preventDefault()
@@ -199,23 +221,20 @@ function getLimitedLinks (vm, h) {
         }
       }
     }
-    const liClasses = getClassesForLink(
-      link,
-      vm.currentPage,
-      vm.listOfPages.length - 1,
-      vm.stepLinks
-    )
     // If the link is a number,
     // then incremented by 1 (since it's 0 based).
     // otherwise, do nothing (so, it's a symbol). 
     const text = Number.isInteger(link) ? link + 1 : link
-    return h('li', { class: liClasses }, [h('a', data, text)])
+    return h('li', [h('a', data, text)])
   })
 }
 
 function getSimpleLinks (vm, h) {
   const lastPage = vm.listOfPages.length - 1
+  const disabledStyle = { cursor: 'no-drop', color: '#CCC' }
   const prevData = {
+    class: 'pagination-previous',
+    style: vm.currentPage <= 0 ? disabledStyle : '',
     on: {
       click: (e) => {
         e.preventDefault()
@@ -224,6 +243,8 @@ function getSimpleLinks (vm, h) {
     }
   }
   const nextData = {
+    class: 'pagination-next',
+    style: vm.currentPage >= lastPage ? disabledStyle : '',
     on: {
       click: (e) => {
         e.preventDefault()
@@ -231,10 +252,8 @@ function getSimpleLinks (vm, h) {
       }
     }
   }
-  const nextListData = { class: ['next', vm.currentPage >= lastPage ? 'disabled' : ''] }
-  const prevListData = { class: ['prev', vm.currentPage <= 0 ? 'disabled' : ''] }
-  const prevLink = h('li', prevListData, [h('a', prevData, vm.simple.prev)])
-  const nextLink = h('li', nextListData, [h('a', nextData, vm.simple.next)])
+  const prevLink = h('li', [h('a', prevData, vm.simple.prev)])
+  const nextLink = h('li', [h('a', nextData, vm.simple.next)])
   return [prevLink, nextLink]
 }
 
@@ -255,25 +274,36 @@ function getListOfPageNumbers (numberOfPages) {
 function getClassesForLink(link, currentPage, lastPage, { prev, next }) {
   let liClass = []
   if (link === prev) {
-    liClass.push('left-arrow')
+    liClass.push('pagination-previous')
   } else if (link === next) {
-    liClass.push('right-arrow')
+    liClass.push('pagination-next')
   } else if (link === ELLIPSES) {
-    liClass.push('ellipses')
+    liClass.push('pagination-link')
   } else {
-    liClass.push('number')
+    liClass.push('pagination-link')
   }
 
   if (link === currentPage) {
-    liClass.push('active')
+    liClass.push('is-current')
+  }
+
+  return liClass
+}
+
+function getStylesForDisabled(link, currentPage, lastPage, {prev, next}) {
+  let disabledStyle = []
+  let disabled = {
+    cursor: 'no-drop',
+    color: '#CCC'
   }
 
   if (link === prev && currentPage <= 0) {
-    liClass.push('disabled')
+    disabledStyle.push(disabled)
   } else if (link === next && currentPage >= lastPage) {
-    liClass.push('disabled')
+    disabledStyle.push(disabled)
   }
-  return liClass
+
+  return disabledStyle
 }
 
 function getTargetPageForLink (link, limit, currentPage, listOfPages, { prev, next }, metaData = null) {
